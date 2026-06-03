@@ -24,4 +24,4 @@ bun test --cwd packages/sqlite-crypto
 
 ## Publishing
 
-Each package has a manual **release** workflow in GitHub Actions. Set the **version** input (e.g. `0.1.0`), optionally enable **dry run** to validate without publishing, then run again with dry run off to publish and tag the repo (`sqlite-migrate-v0.1.0`, etc.).
+Each package has a manual **release** workflow. Set **version**, run with **dry run** first, then publish for real. Releases stage under `release/<name>/` outside workspaces; the **verify npm publish access** step dry-runs before the real publish.

@@ -1,5 +1,6 @@
 {
   "name": "@khoralabs/sqlite-utils",
+  "private": true,
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
