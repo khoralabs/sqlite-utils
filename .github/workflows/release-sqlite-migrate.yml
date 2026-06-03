@@ -43,11 +43,6 @@ jobs:
         with:
           bun-version: latest
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-
       - name: configure npm auth
         run: |
           if [ -z "${NPM_TOKEN:-}" ]; then
