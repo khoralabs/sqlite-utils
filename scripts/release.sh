@@ -22,6 +22,7 @@ esac
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pkg_dir="$root/packages/$PACKAGE"
 pkg_json="$pkg_dir/package.json"
+npm_scope="@khoralabs/$PACKAGE"
 git_tag="${PACKAGE}-v${VERSION}"
 
 if [ ! -f "$pkg_json" ]; then
@@ -40,13 +41,14 @@ bun test "packages/$PACKAGE"
 echo "Typechecking..."
 bun run typecheck
 
-echo "Setting @khoralabs/$PACKAGE to $VERSION..."
+echo "Setting ${npm_scope} to $VERSION..."
 node -e "
   const fs = require('node:fs');
   const path = process.argv[1];
   const version = process.argv[2];
   const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
   pkg.version = version;
+  delete pkg.private;
   fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
 " "$pkg_json" "$VERSION"
 
@@ -60,12 +62,23 @@ revert_package_json() {
   fi
 }
 
+cleanup_tarball() {
+  if [ -n "${tarball_path:-}" ] && [ -f "$tarball_path" ]; then
+    rm -f "$tarball_path"
+  fi
+}
+
 if ! dry_run; then
-  if [ -z "${NPM_TOKEN:-}" ] && ! npm whoami &>/dev/null; then
-    echo "NPM_TOKEN is required (or run npm login locally)" >&2
+  if [ -z "${NPM_TOKEN:-}" ]; then
+    echo "NPM_TOKEN is required" >&2
     revert_package_json
     exit 1
   fi
+  auth_line="//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
+  npmrc_content=$"legacy-peer-deps=true\n${auth_line}\n"
+  printf '%s' "$npmrc_content" > "$HOME/.npmrc"
+  printf '%s' "$npmrc_content" > "$root/.npmrc"
+  echo "npm identity: $(npm whoami)"
 fi
 
 publish_args=(--access public --tag "$NPM_TAG" --legacy-peer-deps)
@@ -73,8 +86,35 @@ if dry_run; then
   publish_args+=(--dry-run)
 fi
 
-echo "Publishing @khoralabs/$PACKAGE@${VERSION} (dist-tag: ${NPM_TAG})..."
-(cd "$pkg_dir" && npm publish "${publish_args[@]}")
+echo "Publishing ${npm_scope}@${VERSION} (dist-tag: ${NPM_TAG})..."
+trap cleanup_tarball EXIT
+cd "$pkg_dir"
+tarball_name=$(npm pack --silent)
+tarball_path="$pkg_dir/$tarball_name"
+
+publish_output=$(npm publish "$tarball_path" "${publish_args[@]}" 2>&1) || publish_status=$?
+echo "$publish_output"
+
+if [ "${publish_status:-0}" -ne 0 ]; then
+  echo "::error::npm publish failed for ${npm_scope}" >&2
+  revert_package_json
+  exit 1
+fi
+
+if echo "$publish_output" | grep -q "Skipping workspace.*private"; then
+  echo "::error::npm skipped publish because the package is marked private" >&2
+  revert_package_json
+  exit 1
+fi
+
+if ! echo "$publish_output" | grep -qE "^\+ ${npm_scope}@${VERSION}"; then
+  echo "::error::npm publish did not report success for ${npm_scope}@${VERSION}" >&2
+  revert_package_json
+  exit 1
+fi
+
+cleanup_tarball
+trap - EXIT
 
 if dry_run; then
   echo "Dry run complete; reverting $pkg_json and skipping git tag/push"
@@ -86,9 +126,14 @@ git config user.name "${GIT_USER_NAME:-github-actions[bot]}"
 git config user.email "${GIT_USER_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
 
 git add "$pkg_json"
-git commit -m "release @khoralabs/$PACKAGE v${VERSION}"
+if git diff --cached --quiet; then
+  echo "::error::package.json has no changes to commit; publish may have been skipped" >&2
+  exit 1
+fi
+
+git commit -m "release ${npm_scope} v${VERSION}"
 git tag "$git_tag"
 git push origin HEAD
 git push origin "$git_tag"
 
-echo "Released @khoralabs/$PACKAGE@${VERSION} (git tag: $git_tag)"
+echo "Released ${npm_scope}@${VERSION} (git tag: $git_tag)"

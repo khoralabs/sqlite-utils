@@ -49,7 +49,9 @@ jobs:
             echo "::error::NPM_TOKEN repository secret is empty or unset"
             exit 1
           fi
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$HOME/.npmrc"
+          printf '%s\n%s\n' 'legacy-peer-deps=true' "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          cp .npmrc "$HOME/.npmrc"
+          npm whoami
 
       - name: release
         run: bash scripts/release.sh
