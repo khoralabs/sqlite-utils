@@ -1,0 +1,60 @@
+name: release @khoralabs/sqlite-migrate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver to publish (e.g. 0.1.0)"
+        required: true
+        type: string
+      tag:
+        description: "npm dist-tag"
+        required: true
+        type: choice
+        default: latest
+        options:
+          - latest
+          - next
+      dry_run:
+        description: "Run npm publish --dry-run; skip git commit/tag/push"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE: sqlite-migrate
+      VERSION: ${{ inputs.version }}
+      NPM_TAG: ${{ inputs.tag }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: configure npm auth
+        run: |
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN repository secret is empty or unset"
+            exit 1
+          fi
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$HOME/.npmrc"
+
+      - name: release
+        run: bash scripts/release.sh

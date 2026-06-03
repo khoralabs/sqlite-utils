@@ -2,7 +2,10 @@
   "name": "@khoralabs/sqlite-crypto",
   "version": "0.0.0",
   "type": "module",
-  "private": true,
+  "files": ["src"],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",

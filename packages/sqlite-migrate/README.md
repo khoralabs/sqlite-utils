@@ -23,4 +23,4 @@ bun test --cwd packages/sqlite-migrate
 
 ## Publishing
 
-Use the **Publish @khoralabs/sqlite-migrate** GitHub Actions workflow. Enable **dry run** to validate the package without publishing.
+Use the **release @khoralabs/sqlite-migrate** GitHub Actions workflow. Set **version** (e.g. `0.1.0`); enable **dry run** first to validate without publishing.

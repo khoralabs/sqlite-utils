@@ -23,4 +23,4 @@ bun test --cwd packages/sqlite-crypto
 
 ## Publishing
 
-Use the **Publish @khoralabs/sqlite-crypto** GitHub Actions workflow. Enable **dry run** to validate the package without publishing.
+Use the **release @khoralabs/sqlite-crypto** GitHub Actions workflow. Set **version** (e.g. `0.1.0`); enable **dry run** first to validate without publishing.
