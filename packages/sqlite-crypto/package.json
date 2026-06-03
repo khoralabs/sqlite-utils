@@ -12,12 +12,6 @@
   },
   "scripts": {
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   }
 }

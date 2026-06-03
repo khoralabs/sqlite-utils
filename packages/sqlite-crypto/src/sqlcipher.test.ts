@@ -1,15 +1,11 @@
 import { Database } from "bun:sqlite";
-import { existsSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "bun:test";
+import { existsSync, unlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { SqliteCryptoError } from "./errors";
-import {
-  openEncryptedDatabase,
-  openEncryptedDatabaseSync,
-  resolveSqlCipherLib,
-} from "./sqlcipher";
-import { TestSqlCipherKeyProvider, TEST_SQLCIPHER_KEY } from "./test-keys";
+import { openEncryptedDatabase, openEncryptedDatabaseSync, resolveSqlCipherLib } from "./sqlcipher";
+import { TEST_SQLCIPHER_KEY, TestSqlCipherKeyProvider } from "./test-keys";
 
 function probeSqlCipher(): boolean {
   const path = join(tmpdir(), `sqlite-crypto-probe-${process.pid}.db`);

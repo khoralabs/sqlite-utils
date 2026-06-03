@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { SqliteCryptoError } from "./errors";
 import { assertSqlCipherKey, EnvSqlCipherKeyProvider } from "./key-provider";
-import { TestSqlCipherKeyProvider, TEST_SQLCIPHER_KEY } from "./test-keys";
+import { TEST_SQLCIPHER_KEY, TestSqlCipherKeyProvider } from "./test-keys";
 
 const ENV_KEYS = ["APP_DB_KEY", "OTHER_SCOPE_KEY"] as const;
 

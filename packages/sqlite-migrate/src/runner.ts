@@ -147,12 +147,11 @@ function safeRollback(db: Database): void {
   }
 }
 
-function finalize(db: Database, plan: RunPlan): void {
+function finalize(_db: Database, plan: RunPlan): void {
   const { applied, skipped } = plan.result;
   const finalVersion =
     applied.length > 0 ? highestTo(applied) : skipped.length > 0 ? highestTo(skipped) : null;
   plan.result.finalVersion = finalVersion;
-
 }
 
 function ensureTrackingTable(db: Database, tableName: string): void {

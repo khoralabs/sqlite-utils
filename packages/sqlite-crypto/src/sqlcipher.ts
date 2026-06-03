@@ -76,9 +76,7 @@ function applySqlCipherKey(db: Database, key: string): void {
   }
 }
 
-export type OpenEncryptedDatabaseOptions = DatabaseOptions & {
-  readonly?: boolean;
-};
+export type OpenEncryptedDatabaseOptions = DatabaseOptions;
 
 /**
  * Open a SQLCipher-protected SQLite database.
