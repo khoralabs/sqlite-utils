@@ -1,9 +1,11 @@
 {
   "name": "@khoralabs/sqlite-crypto",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "SQLCipher helpers for Bun SQLite",
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/khoralabs/sqlite-utils.git",
