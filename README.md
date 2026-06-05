@@ -2,6 +2,8 @@
 
 Monorepo of SQLite utilities for Bun.
 
+Licensed under [MIT](LICENSE).
+
 ## Packages
 
 | Package | Description |

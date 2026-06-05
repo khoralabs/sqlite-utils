@@ -1,9 +1,10 @@
 {
   "name": "@khoralabs/sqlite-migrate",
   "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "description": "SQLite migration runner for Bun",
-  "files": ["src"],
+  "files": ["src", "LICENSE"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/khoralabs/sqlite-utils.git",

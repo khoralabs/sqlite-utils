@@ -49,12 +49,18 @@ export async function stageSqliteRelease(
     cpSync(readmePath, path.join(releaseDir, "README.md"));
   }
 
+  const licensePath = path.join(pkgDir, "LICENSE");
+  if (existsSync(licensePath)) {
+    cpSync(licensePath, path.join(releaseDir, "LICENSE"));
+  }
+
   const staged: Record<string, unknown> = {
     name: source.name,
     version,
     description: source.description,
+    license: source.license ?? "MIT",
     type: source.type ?? "module",
-    files: source.files ?? ["src"],
+    files: source.files ?? ["src", "LICENSE"],
     repository: source.repository,
     exports: source.exports,
     publishConfig: { access: "public" },
